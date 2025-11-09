@@ -1,0 +1,211 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+header {
+    text-align: center;
+    color: white;
+    margin-bottom: 40px;
+}
+
+h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+.subtitle {
+    font-size: 1.1em;
+    opacity: 0.9;
+}
+
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.city-name {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #667eea;
+}
+
+.aqi-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 600;
+    color: white;
+}
+
+.aqi-good { background: #10b981; }
+.aqi-fair { background: #3b82f6; }
+.aqi-moderate { background: #f59e0b; }
+.aqi-poor { background: #ef4444; }
+.aqi-very-poor { background: #991b1b; }
+
+.card-body {
+    margin: 20px 0;
+}
+
+.metric-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.metric-row:last-child {
+    border-bottom: none;
+}
+
+.metric-label {
+    color: #666;
+    font-size: 0.95em;
+}
+
+.metric-value {
+    font-size: 1.3em;
+    font-weight: 600;
+    color: #333;
+}
+
+.weather-icon {
+    font-size: 3em;
+    text-align: center;
+    margin: 15px 0;
+}
+
+.loading {
+    text-align: center;
+    color: white;
+    font-size: 1.5em;
+    margin: 50px 0;
+}
+
+.error {
+    background: #ff6b6b;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    margin: 20px 0;
+}
+
+.refresh-btn {
+    background: white;
+    color: #667eea;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    display: block;
+    margin: 30px auto;
+}
+
+.refresh-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 7px 20px rgba(0,0,0,0.3);
+}
+
+.last-updated {
+    text-align: center;
+    color: white;
+    margin-top: 30px;
+    opacity: 0.8;
+    font-size: 0.9em;
+}
+
+.comparison-section {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.comparison-title {
+    font-size: 1.5em;
+    color: #667eea;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.comparison-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.comparison-item {
+    text-align: center;
+    padding: 15px;
+    background: #f9fafb;
+    border-radius: 10px;
+}
+
+.comparison-item h3 {
+    color: #667eea;
+    font-size: 0.9em;
+    margin-bottom: 10px;
+}
+
+.comparison-item .value {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #333;
+}
+
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2em;
+    }
+    
+    .metric-value {
+        font-size: 1.1em;
+    }
+
+    .dashboard {
+        grid-template-columns: 1fr;
+    }
+}

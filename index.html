@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Climate Insights Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌍 Climate Insights Dashboard</h1>
+            <p class="subtitle">Real-time Multi-City Weather & Air Quality Monitoring</p>
+        </header>
+
+        <div id="loading" class="loading">
+            Loading climate data from all cities...
+        </div>
+
+        <div id="error" class="error" style="display: none;"></div>
+
+        <div id="content" style="display: none;">
+            <div class="dashboard" id="city-cards">
+                </div>
+
+            <div class="comparison-section" id="comparison">
+                <h2 class="comparison-title">📊 City Comparison</h2>
+                <div class="comparison-grid" id="comparison-grid">
+                    </div>
+            </div>
+
+            <button class="refresh-btn" onclick="fetchWeatherData()">🔄 Refresh Data</button>
+
+            <div class="last-updated" id="last-fetch">
+                Data fetched from AWS DynamoDB
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

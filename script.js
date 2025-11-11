@@ -6,6 +6,35 @@ const CITIES = ['Chennai', 'Delhi', 'Mumbai', 'Bangalore'];
 
 let temperatureChart, aqiChart, deviationChart;
 
+// Tab switching function
+function switchTab(tabName) {
+    // Hide all tabs
+    const tabs = document.querySelectorAll('.tab-content');
+    tabs.forEach(tab => tab.classList.remove('active'));
+    
+    // Remove active class from all buttons
+    const buttons = document.querySelectorAll('.tab-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    
+    // Show selected tab
+    const selectedTab = document.getElementById(`${tabName}-tab`);
+    if (selectedTab) {
+        selectedTab.classList.add('active');
+    }
+    
+    // Set active button
+    event.target.classList.add('active');
+    
+    // Resize charts if comparison tab is shown
+    if (tabName === 'comparison') {
+        setTimeout(() => {
+            if (temperatureChart) temperatureChart.resize();
+            if (aqiChart) aqiChart.resize();
+            if (deviationChart) deviationChart.resize();
+        }, 100);
+    }
+}
+
 function getWeatherIcon(weather) {
     const icons = {
         'Clear': '☀️',
@@ -314,15 +343,15 @@ async function fetchWeatherData() {
     const loadingEl = document.getElementById('loading');
     const errorEl = document.getElementById('error');
     const contentEl = document.getElementById('content');
-    const chartsSection = document.getElementById('charts-section');
+    const cityCardsEl = document.getElementById('city-cards');
+    const comparisonEl = document.getElementById('comparison-grid');
 
     loadingEl.style.display = 'block';
     errorEl.style.display = 'none';
     contentEl.style.display = 'none';
-    chartsSection.style.display = 'none';
 
     try {
-        // Fetch anomalies data from the new endpoint
+        // Fetch anomalies data from the endpoint
         const response = await fetch(ANOMALIES_API_URL);
         const result = await response.json();
         
@@ -334,6 +363,23 @@ async function fetchWeatherData() {
         
         const allData = anomaliesData.anomalies || anomaliesData;
 
+        // Convert anomaly data to match city card format for display
+        const cardData = allData.map(item => ({
+            city: item.city,
+            temperature: parseFloat(item.current_temp),
+            humidity: '70', // Default value since not in API response
+            aqi: parseFloat(item.current_aqi),
+            weather: 'Partly Cloudy',
+            description: item.is_temp_anomaly || item.is_aqi_anomaly ? 'Anomaly Detected ⚠️' : 'Normal',
+            timestamp: item.timestamp
+        }));
+
+        // Populate city cards
+        cityCardsEl.innerHTML = cardData.map(data => createCityCard(data)).join('');
+
+        // Populate comparison stats
+        comparisonEl.innerHTML = createComparison(cardData);
+
         // Create charts with the anomalies data
         createTemperatureChart(allData);
         createAQIChart(allData);
@@ -344,7 +390,6 @@ async function fetchWeatherData() {
 
         loadingEl.style.display = 'none';
         contentEl.style.display = 'block';
-        chartsSection.style.display = 'block';
 
     } catch (error) {
         console.error('Error fetching weather data:', error);

@@ -1,7 +1,10 @@
-// REPLACE WITH YOUR API GATEWAY URL
+
 const API_URL = 'https://5vaw6kvmpk.execute-api.ap-south-1.amazonaws.com/prod/latest';
+const ANOMALIES_API_URL = 'https://ksgmwb8pah.execute-api.ap-south-1.amazonaws.com/prod';
 
 const CITIES = ['Chennai', 'Delhi', 'Mumbai', 'Bangalore'];
+
+let temperatureChart, aqiChart, deviationChart;
 
 function getWeatherIcon(weather) {
     const icons = {
@@ -116,38 +119,232 @@ function createComparison(allData) {
     `;
 }
 
+function createTemperatureChart(data) {
+    const ctx = document.getElementById('temperatureChart').getContext('2d');
+    
+    if (temperatureChart) {
+        temperatureChart.destroy();
+    }
+
+    temperatureChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: data.map(d => d.city),
+            datasets: [
+                {
+                    label: 'Current Temperature (°C)',
+                    data: data.map(d => parseFloat(d.current_temp)),
+                    backgroundColor: '#ef4444',
+                    borderColor: '#991b1b',
+                    borderWidth: 2,
+                },
+                {
+                    label: 'Average Temperature (°C)',
+                    data: data.map(d => parseFloat(d.avg_temp)),
+                    backgroundColor: '#3b82f6',
+                    borderColor: '#1e40af',
+                    borderWidth: 2,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    labels: {
+                        font: { size: 12, weight: 'bold' },
+                        padding: 20,
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Temperature Comparison (Current vs Average)',
+                    font: { size: 14, weight: 'bold' }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    title: {
+                        display: true,
+                        text: 'Temperature (°C)'
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createAQIChart(data) {
+    const ctx = document.getElementById('aqiChart').getContext('2d');
+    
+    if (aqiChart) {
+        aqiChart.destroy();
+    }
+
+    aqiChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: data.map(d => d.city),
+            datasets: [
+                {
+                    label: 'Current AQI',
+                    data: data.map(d => parseFloat(d.current_aqi)),
+                    backgroundColor: '#f59e0b',
+                    borderColor: '#b45309',
+                    borderWidth: 2,
+                },
+                {
+                    label: 'Average AQI',
+                    data: data.map(d => parseFloat(d.avg_aqi)),
+                    backgroundColor: '#10b981',
+                    borderColor: '#065f46',
+                    borderWidth: 2,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    labels: {
+                        font: { size: 12, weight: 'bold' },
+                        padding: 20,
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Air Quality Index Comparison (Current vs Average)',
+                    font: { size: 14, weight: 'bold' }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'AQI Value'
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createDeviationChart(data) {
+    const ctx = document.getElementById('deviationChart').getContext('2d');
+    
+    if (deviationChart) {
+        deviationChart.destroy();
+    }
+
+    const colors = data.map(d => ({
+        temp: d.is_temp_anomaly ? '#ef4444' : '#10b981',
+        aqi: d.is_aqi_anomaly ? '#ef4444' : '#10b981'
+    }));
+
+    deviationChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.map(d => d.city),
+            datasets: [
+                {
+                    label: 'Temperature Deviation (°C)',
+                    data: data.map(d => parseFloat(d.temp_deviation)),
+                    borderColor: '#ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 6,
+                    pointBackgroundColor: data.map(d => d.is_temp_anomaly ? '#991b1b' : '#10b981'),
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                },
+                {
+                    label: 'AQI Deviation',
+                    data: data.map(d => parseFloat(d.aqi_deviation)),
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 6,
+                    pointBackgroundColor: data.map(d => d.is_aqi_anomaly ? '#b45309' : '#10b981'),
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    labels: {
+                        font: { size: 12, weight: 'bold' },
+                        padding: 20,
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Deviation from Average (Red Points = Anomalies Detected)',
+                    font: { size: 14, weight: 'bold' }
+                }
+            },
+            scales: {
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Deviation Value'
+                    }
+                }
+            }
+        }
+    });
+}
+
+
 async function fetchWeatherData() {
     const loadingEl = document.getElementById('loading');
     const errorEl = document.getElementById('error');
     const contentEl = document.getElementById('content');
-    const cityCardsEl = document.getElementById('city-cards');
-    const comparisonEl = document.getElementById('comparison-grid');
+    const chartsSection = document.getElementById('charts-section');
 
     loadingEl.style.display = 'block';
     errorEl.style.display = 'none';
     contentEl.style.display = 'none';
+    chartsSection.style.display = 'none';
 
     try {
-        // Fetch data for all cities
-        const promises = CITIES.map(city => 
-            fetch(`${API_URL}?city=${city}`)
-                .then(res => res.json())
-                .then(result => result.data || result)
-        );
-
-        const allData = await Promise.all(promises);
-
-        // Create city cards
-        cityCardsEl.innerHTML = allData.map(data => createCityCard(data)).join('');
-
+        // Fetch anomalies data from the new endpoint
+        const response = await fetch(ANOMALIES_API_URL);
+        const result = await response.json();
         
-        comparisonEl.innerHTML = createComparison(allData);
+        // Parse the body if it's a string (AWS Lambda response)
+        let anomaliesData = result;
+        if (typeof result.body === 'string') {
+            anomaliesData = JSON.parse(result.body);
+        }
+        
+        const allData = anomaliesData.anomalies || anomaliesData;
+
+        // Create charts with the anomalies data
+        createTemperatureChart(allData);
+        createAQIChart(allData);
+        createDeviationChart(allData);
 
         document.getElementById('last-fetch').textContent = 
             `Last updated: ${new Date().toLocaleTimeString('en-IN')}`;
 
         loadingEl.style.display = 'none';
         contentEl.style.display = 'block';
+        chartsSection.style.display = 'block';
 
     } catch (error) {
         console.error('Error fetching weather data:', error);

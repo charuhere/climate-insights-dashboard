@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Climate Insights Dashboard</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -21,12 +24,29 @@
 
         <div id="content" style="display: none;">
             <div class="dashboard" id="city-cards">
-                </div>
+            </div>
 
             <div class="comparison-section" id="comparison">
                 <h2 class="comparison-title">📊 City Comparison</h2>
                 <div class="comparison-grid" id="comparison-grid">
+                </div>
+            </div>
+
+            <div class="charts-section" id="charts-section" style="display: none;">
+                <h2 class="charts-title">📈 Temperature & AQI Anomalies</h2>
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <canvas id="temperatureChart"></canvas>
                     </div>
+                    <div class="chart-container">
+                        <canvas id="aqiChart"></canvas>
+                    </div>
+                </div>
+                <div class="charts-grid">
+                    <div class="chart-container full-width">
+                        <canvas id="deviationChart"></canvas>
+                    </div>
+                </div>
             </div>
 
             <button class="refresh-btn" onclick="fetchWeatherData()">🔄 Refresh Data</button>
@@ -39,4 +59,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>
